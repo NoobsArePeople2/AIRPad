@@ -1,0 +1,121 @@
+{
+    "_desc": "Xbox 360 on Mac with Tattiebogle driver.",
+
+    "buttons": {
+
+        "faceOne": {
+            "_desc": "A",
+            "index": 16
+        },
+
+        "faceTwo": {
+            "_desc": "B",
+            "index": 17
+        },
+
+        "faceThree": {
+            "_desc": "X",
+            "index": 18
+        },
+
+        "faceFour": {
+            "_desc": "Y",
+            "index": 19
+        },
+
+        "l1": {
+            "_desc": "Left bumper",
+            "index": 13
+        },
+
+        "l3": {
+            "_desc": "Left stick press",
+            "index": 11
+        },
+
+        "r1": {
+            "_desc": "Right bumper",
+            "index": 14
+        },
+
+        "r3": {
+            "_desc": "Right stick press",
+            "index": 12
+        },
+
+        "dpadUp": {
+            "_desc": "D-Pad up",
+            "index": 5
+        },
+
+        "dpadRight": {
+            "_desc": "D-Pad right",
+            "index": 8
+        },
+
+        "dpadDown": {
+            "_desc": "D-Pad down",
+            "index": 6
+        },
+
+        "dpadLeft": {
+            "_desc": "D-Pad left",
+            "index": 7
+        },
+
+        "start": {
+            "_desc": "Start",
+            "index": 9
+        },
+
+        "select": {
+            "_desc": "Back",
+            "index": 10
+        },
+
+        "system": {
+            "_desc": "Guide (Xbox)",
+            "index": 15
+        }
+
+    },
+
+    "axes": {
+
+        "leftStickX": {
+            "_desc": "Left stick, x-axis",
+            "index": 0
+        },
+
+        "leftStickY": {
+            "_desc": "Left stick, y-axis",
+            "index": 1
+        },
+
+        "rightStickX": {
+            "_desc": "Right stick, x-axis",
+            "index": 2
+        },
+
+        "rightStickY": {
+            "_desc": "Right stick, y-axis",
+            "index": 3
+        },
+
+        "l2": {
+            "_desc": "Left trigger",
+            "index": 4
+        },
+
+        "r2": {
+            "_desc": "Right trigger",
+            "index": 5
+        }
+
+    },
+
+    "deadZone": 0.05,
+    "triggerDefault": 0.0,
+    "triggerMin": -1.0,
+    "triggerMax": 1.0
+}

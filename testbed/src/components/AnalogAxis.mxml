@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	width="100" 
+	height="150"
+	creationComplete="onCreationComplete(event)">
+	
+	<s:layout>
+		<s:VerticalLayout
+			horizontalAlign="center"/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private const SHORT_HASH_MARK:uint = 2;
+			private const LONG_HASH_MARK:uint = 4;
+			
+			[Bindable]
+			private var borderStrokeColor:uint = 0xff000000;
+			
+			[Bindable]
+			private var strokeColor:uint = 0xffa7a7a7;
+			
+			[Bindable]
+			private var lightStrokeColor:uint = 0xffe3e3e3;
+			
+			private var _axisName:String = '';
+			[Bindable]
+			public function get axisName():String
+			{
+				return _axisName;
+			}
+			
+			public function set axisName(value:String):void
+			{
+				_axisName = value;
+			}
+			
+			[Bindable]
+			private var nubWidth:uint = 6;
+			
+			[Bindable]
+			private var nubHeight:uint = 6;
+			
+			private var nhw:Number = nubWidth / 2;
+			private var nhh:Number = nubHeight / 2;
+			
+			[Bindable]
+			private var nubBorderColor:uint = 0xff009100;
+			
+			[Bindable]
+			private var nubColor:uint = 0xff00ff00;
+			
+			[Bindable]
+			private var nubX:Number = 0;
+			
+			[Bindable]
+			private var nubY:Number = 0;
+			
+			[Bindable]
+			private var rawX:Number = 0;
+			
+			[Bindable]
+			private var rawY:Number = 0;
+			
+			private var ready:Boolean = false;
+			private function onCreationComplete(e:FlexEvent):void
+			{
+				nubX = grid.width / 2 - nhw;
+				nubY = grid.height / 2 - nhh;			
+				ready = true;
+			}
+			
+			public var deadZone:Number = 0;
+			
+			public function setNubPos(nx:Number, ny:Number):void
+			{
+				if (!ready) return;
+				
+				rawX = nx;
+				rawY = ny;
+				
+				nubX = transformValue(nx) - nhw;
+				nubY = transformValue(ny) - nhh;
+			}
+			
+			private function transformValue(value:Number):Number
+			{
+				var gridRange:Number = grid.width;
+				var stickRange:Number = 2.0;
+				return (((value - -1) * gridRange) / stickRange) + 0;
+			}
+			
+			public function reset():void
+			{
+				nubX = grid.width / 2 - nhw;
+				nubY = grid.height / 2 - nhh;
+				rawX = 0;
+				rawY = 0;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label
+		text="{axisName}"/>
+	
+	<s:Group
+		id="grid"
+		width="100"
+		height="100">
+		
+		<!-- Horizontal -->
+		
+			<!-- Center -->
+			<s:Line
+				xFrom="0"
+				xTo="{grid.width}"
+				yFrom="{grid.height / 2}"
+				yTo="{grid.height / 2}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{strokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+			
+			<!-- 25% -->
+			<s:Line
+				xFrom="0"
+				xTo="{grid.width}"
+				yFrom="{grid.height * 0.25}"
+				yTo="{grid.height * 0.25}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{lightStrokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+			
+			<!-- 75% -->
+			<s:Line
+				xFrom="0"
+				xTo="{grid.width}"
+				yFrom="{grid.height * 0.75}"
+				yTo="{grid.height * 0.75}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{lightStrokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+		
+			
+		
+		
+		<!-- Vertical -->
+			<s:Line
+				xFrom="{grid.width / 2}"
+				xTo="{grid.width / 2}"
+				yFrom="0"
+				yTo="{grid.height}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{strokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+		
+			<!-- 25% -->
+			<s:Line
+				xFrom="{grid.width * 0.25}"
+				xTo="{grid.width * 0.25}"
+				yFrom="0"
+				yTo="{grid.height}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{lightStrokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+			
+			<!-- 75% -->
+			<s:Line
+				xFrom="{grid.width * 0.75}"
+				xTo="{grid.width * 0.75}"
+				yFrom="0"
+				yTo="{grid.height}">
+				
+				<s:stroke>
+					<s:SolidColorStroke
+						color="{lightStrokeColor}"/>
+				</s:stroke>
+				
+			</s:Line>
+		
+		<!-- Vertical Hash Marks -->
+		<s:Line
+			xFrom="{grid.width / 2 - SHORT_HASH_MARK}"
+			xTo="{grid.width / 2 + SHORT_HASH_MARK}"
+			yFrom="{grid.height * 0.125}"
+			yTo="{grid.height * 0.125}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width / 2 - LONG_HASH_MARK}"
+			xTo="{grid.width / 2 + LONG_HASH_MARK}"
+			yFrom="{grid.height * 0.25}"
+			yTo="{grid.height * 0.25}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width / 2 - SHORT_HASH_MARK}"
+			xTo="{grid.width / 2 + SHORT_HASH_MARK}"
+			yFrom="{grid.height * 0.375}"
+			yTo="{grid.height * 0.375}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width / 2 - SHORT_HASH_MARK}"
+			xTo="{grid.width / 2 + SHORT_HASH_MARK}"
+			yFrom="{grid.height * 0.625}"
+			yTo="{grid.height * 0.625}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width / 2 - LONG_HASH_MARK}"
+			xTo="{grid.width / 2 + LONG_HASH_MARK}"
+			yFrom="{grid.height * 0.75}"
+			yTo="{grid.height * 0.75}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width / 2 - SHORT_HASH_MARK}"
+			xTo="{grid.width / 2 + SHORT_HASH_MARK}"
+			yFrom="{grid.height * 0.875}"
+			yTo="{grid.height * 0.875}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<!-- Horizontal Hash Marks -->
+		<s:Line
+			xFrom="{grid.width * 0.125}"
+			xTo="{grid.width * 0.125}"
+			yFrom="{grid.height / 2 - SHORT_HASH_MARK}"
+			yTo="{grid.height / 2 + SHORT_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Line
+			xFrom="{grid.width * 0.25}"
+			xTo="{grid.width * 0.25}"
+			yFrom="{grid.height / 2 - LONG_HASH_MARK}"
+			yTo="{grid.height / 2 + LONG_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+	
+		<s:Line
+			xFrom="{grid.width * 0.375}"
+			xTo="{grid.width * 0.375}"
+			yFrom="{grid.height / 2 - SHORT_HASH_MARK}"
+			yTo="{grid.height / 2 + SHORT_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+	
+		<s:Line
+			xFrom="{grid.width * 0.625}"
+			xTo="{grid.width * 0.625}"
+			yFrom="{grid.height / 2 - SHORT_HASH_MARK}"
+			yTo="{grid.height / 2 + SHORT_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+	
+		<s:Line
+			xFrom="{grid.width * 0.75}"
+			xTo="{grid.width * 0.75}"
+			yFrom="{grid.height / 2 - LONG_HASH_MARK}"
+			yTo="{grid.height / 2 + LONG_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+	
+		<s:Line
+			xFrom="{grid.width * 0.875}"
+			xTo="{grid.width * 0.875}"
+			yFrom="{grid.height / 2 - SHORT_HASH_MARK}"
+			yTo="{grid.height /2 + SHORT_HASH_MARK}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"/>
+			</s:stroke>
+			
+		</s:Line>
+		
+		<s:Rect
+			width="100%"
+			height="100%">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{borderStrokeColor}"
+					weight="1"/>
+			</s:stroke>
+			
+		</s:Rect>
+		
+		<s:Ellipse
+			id="nub"
+			width="{nubWidth}"
+			height="{nubHeight}"
+			x="{nubX}"
+			y="{nubY}">
+			
+			<s:stroke>
+				<s:SolidColorStroke
+					color="{nubBorderColor}"
+					weight="1"/>
+			</s:stroke>
+			
+			<s:fill>
+				<s:SolidColor
+					color="{nubColor}"/>
+			</s:fill>
+			
+		</s:Ellipse>
+		
+	</s:Group>
+	
+	<s:Label
+		width="100%"
+		text="x: {rawX.toFixed(8)}"/>
+	
+	<s:Label
+		width="100%"
+		text="y: {rawY.toFixed(8)}"/>
+	
+</s:Group>

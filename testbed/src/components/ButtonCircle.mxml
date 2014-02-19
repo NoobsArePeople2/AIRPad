@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Graphic 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	width="50" 
+	height="50">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			private const DOWN_COLOR:uint = 0xffff0000;
+			private const UP_COLOR:uint = 0xff00ff00;
+			
+			private const DOWN_COLOR_BORDER:uint = 0xff8f0000;
+			private const UP_COLOR_BORDER:uint = 0xff009100;
+			
+			[Bindable]
+			private var color:uint = UP_COLOR;
+			
+			[Bindable]
+			private var borderColor:uint = UP_COLOR_BORDER;
+			
+			private var _down:Boolean = false;
+			
+			public function get down():Boolean
+			{
+				return _down;
+			}
+			
+			public function set down(value:Boolean):void
+			{
+				_down = value;
+				
+				if (_down)
+				{
+					color = DOWN_COLOR;
+					borderColor = DOWN_COLOR_BORDER;
+				}
+				else
+				{
+					color = UP_COLOR;
+					borderColor = UP_COLOR_BORDER;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Ellipse
+		width="{width}"
+		height="{height}">
+		
+		<s:stroke>
+			<s:SolidColorStroke
+				color="{borderColor}"
+				weight="2"/>
+		</s:stroke>
+		
+		<s:fill>
+			<s:SolidColor
+				color="{color}"/>
+		</s:fill>
+		
+	</s:Ellipse>
+	
+	
+	
+</s:Graphic>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:comp="components.*"
+	width="75" 
+	height="75">
+	
+	<s:layout>
+		<s:VerticalLayout
+			horizontalAlign="center"
+			verticalAlign="middle"/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.utils.StringUtil;
+			
+			import components.AIRPadGraphics;
+			
+			private const STATE_UP:String = "UP";
+			private const STATE_DOWN:String = "DOWN";
+			
+			[Bindable]
+			private var _btnName:String = '';
+			
+			public function get btnName():String
+			{
+				return _btnName;
+			}
+			
+			public function set btnName(value:String):void
+			{
+				_btnName = value;
+			}
+			
+			[Bindable]
+			private var _btnDown:Boolean = false;
+			
+			public function get btnDown():Boolean
+			{
+				return _btnDown;
+			}
+			
+			public function set btnDown(value:Boolean):void
+			{
+				_btnDown = value;
+				if (_btnDown)
+				{
+					_downState = STATE_DOWN;
+				}
+				else
+				{
+					_downState = STATE_UP;
+				}
+			}
+			
+			[Bindable]
+			private var _downState:String = STATE_UP;
+			
+			
+			[Bindable]
+			private var _note:String = '';
+			
+			public function get note():String
+			{
+				return _note;
+			}
+			
+			public function set note(value:String):void
+			{
+				_note = StringUtil.trim(value);
+				if (_note.length > 0)
+				{
+					noteImg.visible = true;  
+				}
+				else
+				{
+					noteImg.visible = false;
+				}
+			}
+			
+			public function reset():void
+			{
+				_downState = STATE_UP;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label
+		id="btnLabel"
+		text="{_btnName}"
+		textAlign="center"/>
+	
+	<s:Group>
+	
+		<comp:ButtonCircle
+			id="btnCircle"
+			down="{_btnDown}"/>
+		
+		<s:Label
+			text="{_downState}"
+			width="100%"
+			height="100%"
+			textAlign="center"
+			verticalAlign="middle"/>
+		
+		<s:Image
+			id="noteImg"
+			source="{AIRPadGraphics.Exclamation}"
+			toolTip="{_note}"
+			visible="false"
+			right="0"/>
+		
+	</s:Group>
+	
+	
+	
+</s:Group>

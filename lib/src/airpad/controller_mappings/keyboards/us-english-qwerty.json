@@ -1,0 +1,68 @@
+{
+    "_desc": "US English QWERTY keyboard.",
+
+    "numKeyboards": 1,
+
+    "buttons": {
+
+        "faceOne": {
+            "key": "SPACE"
+        },
+
+        "faceTwo": {
+            "key": "Z"
+        },
+
+        "faceThree": {
+            "key": "C"
+        },
+
+        "faceFour": {
+            "key": "X"
+        },
+
+        "l1": {
+            "key": "A"
+        },
+
+        "r1": {
+            "key": "D"
+        },
+
+        "l2": {
+            "key": "SHIFT"
+        },
+
+        "r2": {
+            "key": "CTRL"
+        },
+
+        "dpadUp": {
+            "key": "UP"
+        },
+
+        "dpadRight": {
+            "key": "RIGHT"
+        },
+
+        "dpadDown": {
+            "key": "DOWN"
+        },
+
+        "dpadLeft": {
+            "key": "LEFT"
+        },
+
+        "start": {
+            "key": "ENTER"
+        },
+
+        "select": {
+            "key": "TAB"
+        },
+
+        "system": {
+            "key": "F10"
+        }
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "_desc": "Wiimote on Mac with WJoy driver 0.7.1.",
+
+    "buttons": {
+
+        "faceOne": {
+            "_desc": "1",
+            "index": 9
+        },
+
+        "faceTwo": {
+            "_desc": "2",
+            "index": 10
+        },
+
+        "faceThree": {
+            "_desc": "A",
+            "index": 4
+        },
+
+        "faceFour": {
+            "_desc": "B",
+            "index": 5
+        },
+
+        "l1": {
+            "_desc": "C",
+            "index": 11
+        },
+
+        "r1": {
+            "_desc": "Z",
+            "index": 12
+        },
+
+
+        "dpadUp": {
+            "_desc": "D-Pad up",
+            "index": 2
+        },
+
+        "dpadRight": {
+            "_desc": "D-Pad right",
+            "index": 1
+        },
+
+        "dpadDown": {
+            "_desc": "D-Pad down",
+            "index": 3
+        },
+
+        "dpadLeft": {
+            "_desc": "D-Pad left",
+            "index": 0
+        },
+
+        "start": {
+            "_desc": "+",
+            "index": 6
+        },
+
+        "select": {
+            "_desc": "-",
+            "index": 7
+        },
+
+        "system": {
+            "_desc": "Home",
+            "index": 8
+        }
+
+    },
+
+    "axes": {
+
+        "leftStickX": {
+            "_desc": "Nunchuck stick, x-axis",
+            "index": 0
+        },
+
+        "leftStickY": {
+            "_desc": "Nunchuck stick, y-axis",
+            "index": 1
+        }
+
+    },
+
+    "deadZone": 0.05
+}

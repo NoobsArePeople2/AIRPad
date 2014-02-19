@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	xmlns:comp="components.*"
+	showStatusBar="false"
+	creationComplete="onCreationComplete(event)">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import spark.components.Group;
+			import spark.components.HSlider;
+			import spark.components.Label;
+			import spark.events.IndexChangeEvent;
+			import spark.layouts.VerticalLayout;
+			
+			import airpad.AIRPad;
+			import airpad.AIRPadButton;
+			import airpad.AIRPadEvent;
+			import airpad.AIRPadHelper;
+			import airpad.AIRPadManager;
+			import airpad.AIRPadStick;
+			import airpad.IAIRPadDevice;
+			
+			import components.AnalogAxis;
+			import components.AnalogTrigger;
+			import components.ButtonComponent;
+	
+			private var manager:AIRPadManager;
+			private var currentPad:IAIRPadDevice;
+			private var currentPadIndex:uint = 0;
+			
+			[Bindable]
+			private var numConnectedPads:uint = 0;
+			
+			private var btns:Dictionary;
+			private var axes:Dictionary;
+			private var triggers:Dictionary;
+			
+			[Bindable]
+			private var padFriendlyName:String = '';
+			
+			[Bindable]
+			private var padName:String = '';
+			
+			[Bindable]
+			private var controllerMappings:ArrayCollection;
+			
+			[Bindable]
+			private var dzOptions:ArrayCollection;
+			
+			private function onEnterFrame(e:Event):void
+			{
+				manager.update();
+				
+				var pad:IAIRPadDevice;
+				if (currentPad == null)
+				{
+					pad = manager.getPad(currentPadIndex);
+					currentPad = pad;
+					switchPad();
+				}
+				else
+				{
+					pad = currentPad;
+				}
+				if (!pad) return;
+				
+				var key:String;
+				for (key in btns)
+				{
+					btns[key].btnDown = pad.isButtonDown(key); 
+				}
+				
+				for (key in axes)
+				{
+					var stick:AIRPadStick = pad.getStick(key);
+					if (stick)
+					{
+						axes[key].setNubPos(stick.x, stick.y);	
+					}
+				}
+				
+				for (key in triggers)
+				{
+					triggers[key].setTriggerValue(pad.getTrigger(key));
+				}
+			}
+			
+			private function onPadConnect(e:AIRPadEvent):void
+			{
+				trace("onPadConnect");
+				if (currentPad == null)
+				{
+					currentPad = e.pad;
+					currentPadIndex = e.controllerIndex;
+					switchPad();
+				}
+				
+				numConnectedPads = manager.numConnectedPads;
+			}
+			
+			private function onPadDisconnect(e:AIRPadEvent):void
+			{
+				trace("onPadDisconnect");
+				numConnectedPads = manager.numConnectedPads;
+			}
+			
+			private function nextPad(e:MouseEvent):void
+			{
+				if (manager.numConnectedPads < 2) return;
+				
+				var pad:IAIRPadDevice = null;
+				var deathSpiral:uint = 0;
+				
+				while (pad == null && deathSpiral < manager.MAX_PADS)
+				{
+					currentPadIndex++;
+					if (currentPadIndex > manager.numConnectedPads)
+					{
+						currentPadIndex = 0;
+					}
+					
+					pad = manager.getPad(currentPadIndex);
+					deathSpiral++;
+				}
+				
+				if (pad)
+				{
+					switchPad();
+				}
+			}
+			
+			private function prevPad(e:MouseEvent):void
+			{
+				if (manager.numConnectedPads < 2) return;
+				
+				
+				var pad:IAIRPadDevice = null;
+				var deathSpiral:uint = 0;
+				
+				while (pad == null && deathSpiral < manager.MAX_PADS)
+				{
+					currentPadIndex--;
+					if (currentPadIndex < 0 || currentPadIndex >= manager.MAX_PADS)
+					{
+						currentPadIndex = manager.MAX_PADS - 1;
+					}
+					
+					pad = manager.getPad(currentPadIndex);
+					deathSpiral++;
+				}
+				
+				if (pad)
+				{
+					switchPad();
+				}
+			}
+			
+			private function switchPad():void
+			{
+				var key:String;
+				for (key in btns)
+				{
+					btns[key].reset();
+				}
+				
+				for (key in axes)
+				{
+					axes[key].reset();
+				}
+				
+				for (key in triggers)
+				{
+					triggers[key].reset();
+				}
+				
+				var pad:IAIRPadDevice = manager.getPad(currentPadIndex);
+				if (!pad) return;
+				
+				padFriendlyName = pad.friendlyName;
+				padName = pad.name;
+				
+				currentPad = pad;				
+				dz.value = pad.deadZone;
+				
+				for (key in pad.notes)
+				{
+					var item:* = btns[key];
+					if (item is ButtonComponent)
+					{
+						(item as ButtonComponent).note = pad.notes[key];
+					}
+					else if (item is AnalogAxis)
+					{
+						// Don't currently handle this. Maybe in the future?
+					}
+					else if (item is AnalogTrigger)
+					{
+						// Don't currently handle this. Maybe in the future?
+					}
+					
+				}
+				
+				for (key in axes)
+				{
+					axes[key].deadZone = pad.deadZone;
+				}
+				
+				controllerMappings = new ArrayCollection();
+				if (pad.name.indexOf("wiimote") > -1)
+				{
+					if (AIRPadHelper.isMac())
+					{
+						controllerMappings.addItem("wiimote-no-attachments-horizontal");
+						controllerMappings.addItem("wiimote-with-nunchuck");
+						controllerMappings.addItem("wiimote-classic-controller");
+					}
+				}
+				
+				mappingSelector.visible = controllerMappings.length > 0;
+				
+			}
+			
+			private function onCreationComplete(e:FlexEvent):void
+			{
+				manager = new AIRPadManager();
+				manager.addEventListener(AIRPadEvent.CONNECT, onPadConnect);
+				manager.addEventListener(AIRPadEvent.DISCONNECT, onPadDisconnect);
+				
+				btns = new Dictionary();
+				
+				// Face Buttons
+				var btn:ButtonComponent = new ButtonComponent();
+				var hw:Number = btn.width / 2;
+				var hh:Number = btn.height / 2;
+				
+				btn.id = AIRPadButton.FACE_ONE;
+				btn.btnName = AIRPadButton.FACE_ONE;
+				btn.x = width - (btn.width * 2) - hw;
+				btn.y = (height / 2) + (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.FACE_TWO;
+				btn.btnName = AIRPadButton.FACE_TWO;
+				btn.x = width - btn.width - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.FACE_THREE;
+				btn.btnName = AIRPadButton.FACE_THREE;
+				btn.x = width - (btn.width * 3) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.FACE_FOUR;
+				btn.btnName = AIRPadButton.FACE_FOUR;
+				btn.x = width - (btn.width * 2) - hw;
+				btn.y = (height / 2) - (btn.height + (btn.height /  2)) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Control Buttons
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.START;
+				btn.btnName = AIRPadButton.START;
+				btn.x = (width / 2) + (btn.width * 1) - hw;
+				btn.y = height / 2 - hh - 100;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.SELECT;
+				btn.btnName = AIRPadButton.SELECT;
+				btn.x = (width / 2) - (btn.width * 1) - hw;
+				btn.y = height / 2 - hh - 100;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.SYSTEM;
+				btn.btnName = AIRPadButton.SYSTEM;
+				btn.x = (width / 2) - hw;
+				btn.y = height / 2 - hh - 100;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// DPad
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.DPAD_UP;
+				btn.btnName = AIRPadButton.DPAD_UP;
+				btn.x = (btn.width * 2) - hw;
+				btn.y = (height / 2) - (btn.height + (btn.height /  2)) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.DPAD_RIGHT;
+				btn.btnName = AIRPadButton.DPAD_RIGHT;
+				btn.x = (btn.width * 3) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.DPAD_DOWN;
+				btn.btnName = AIRPadButton.DPAD_DOWN;
+				btn.x = (btn.width * 2) - hw;
+				btn.y = (height / 2) + (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.DPAD_LEFT;
+				btn.btnName = AIRPadButton.DPAD_LEFT;
+				btn.x = (btn.width) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Shoulder Buttons
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.L1;
+				btn.btnName = AIRPadButton.L1;
+				btn.x = (btn.width / 2) - hw;
+				btn.y = (btn.height * 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.L2;
+				btn.btnName = AIRPadButton.L2;
+				btn.x = (btn.width * 2) - hw;
+				btn.y = (btn.height * 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.R1;
+				btn.btnName = AIRPadButton.R1;
+				btn.x = width - (btn.width / 2) - hw;
+				btn.y = (btn.height * 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.R2;
+				btn.btnName = AIRPadButton.R2;
+				btn.x = width - (btn.width * 2) - hw;
+				btn.y = (btn.height * 2) - hh;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Stick Presses
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.R3;
+				btn.btnName = AIRPadButton.R3;
+				btn.x = (width / 2) + (btn.width * 1) - hw;
+				btn.y = height / 2 - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.L3;
+				btn.btnName = AIRPadButton.L3;
+				btn.x = (width / 2) - (btn.width * 1) - hw;
+				btn.y = height / 2 - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Analog as buttons
+				
+				// Left Stick
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.LEFT_STICK_UP;
+				btn.btnName = AIRPadButton.LEFT_STICK_UP;
+				btn.x = (btn.width * 2) - hw;
+				btn.y = (height / 2) - (btn.height + (btn.height /  2)) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.LEFT_STICK_RIGHT;
+				btn.btnName = AIRPadButton.LEFT_STICK_RIGHT;
+				btn.x = (btn.width * 3) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.LEFT_STICK_DOWN;
+				btn.btnName = AIRPadButton.LEFT_STICK_DOWN;
+				btn.x = (btn.width * 2) - hw;
+				btn.y = (height / 2) + (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.LEFT_STICK_LEFT;
+				btn.btnName = AIRPadButton.LEFT_STICK_LEFT;
+				btn.x = (btn.width) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Right Stick
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.RIGHT_STICK_DOWN;
+				btn.btnName = AIRPadButton.RIGHT_STICK_DOWN;
+				btn.x = width - (btn.width * 2) - hw;
+				btn.y = (height / 2) + (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.RIGHT_STICK_RIGHT;
+				btn.btnName = AIRPadButton.RIGHT_STICK_RIGHT;
+				btn.x = width - btn.width - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.RIGHT_STICK_LEFT;
+				btn.btnName = AIRPadButton.RIGHT_STICK_LEFT;
+				btn.x = width - (btn.width * 3) - hw;
+				btn.y = (height / 2) - (btn.height / 2) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				btn = new ButtonComponent();
+				btn.id = AIRPadButton.RIGHT_STICK_UP;
+				btn.btnName = AIRPadButton.RIGHT_STICK_UP;
+				btn.x = width - (btn.width * 2) - hw;
+				btn.y = (height / 2) - (btn.height + (btn.height /  2)) - hh + 300;
+				addElement(btn);
+				btns[btn.id] = btn;
+				
+				// Sticks
+				axes = new Dictionary();
+				
+				var axis:AnalogAxis = new AnalogAxis();
+				axis.id = AIRPadButton.LEFT_STICK;
+				axis.axisName = AIRPadButton.LEFT_STICK;
+				axis.x = (width / 2) - 75 - axis.width;
+				axis.y = (height / 2) + axis.height / 2 - 50;
+				addElement(axis);
+				axes[axis.id] = axis;
+				
+				axis = new AnalogAxis();
+				axis.id = AIRPadButton.RIGHT_STICK;
+				axis.axisName = AIRPadButton.RIGHT_STICK;
+				axis.x = (width / 2) + 75;
+				axis.y = (height / 2) + axis.height / 2 - 50;
+				addElement(axis);
+				axes[axis.id] = axis;
+				
+				// Triggers
+				triggers = new Dictionary();
+				
+				var trigger:AnalogTrigger = new AnalogTrigger();
+				trigger.id = AIRPadButton.LEFT_TRIGGER;
+				trigger.triggerName = AIRPadButton.LEFT_TRIGGER;
+				trigger.x = 225;
+				trigger.y = 125;
+				addElement(trigger);
+				triggers[trigger.id] = trigger;
+				
+				trigger = new AnalogTrigger();
+				trigger.id = AIRPadButton.RIGHT_TRIGGER;
+				trigger.triggerName = AIRPadButton.RIGHT_TRIGGER;
+				trigger.x = width - 225 - trigger.width;
+				trigger.y = 125;
+				addElement(trigger);
+				triggers[trigger.id] = trigger;
+				
+				dzOptions = new ArrayCollection();
+				dzOptions.addItem(AIRPad.DEAD_ZONE_RADIAL);
+//				dzOptions.addItem(AIRPad.DEAD_ZONE_RADIAL_SCALED);
+				dzOptions.addItem(AIRPad.DEAD_ZONE_AXIAL);
+				
+				addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			}
+			
+			private function onDeadZoneChange(e:Event):void
+			{
+				if (currentPad)
+				{
+					currentPad.deadZone = (e.target as HSlider).value;
+					for (var key:String in axes)
+					{
+						axes[key].deadZone = currentPad.deadZone;
+					}
+				}
+			}
+			
+			private function onMappingChange(e:IndexChangeEvent):void
+			{
+				if (currentPad && e.newIndex > -1)
+				{
+					currentPad.setMapping(controllerMappings.getItemAt(e.newIndex) as String);
+					switchPad();
+				}
+			}
+			
+			private function onDeadZoneModeChange(e:IndexChangeEvent):void
+			{
+				if (currentPad && e.newIndex > -1)
+				{
+					currentPad.deadZoneMode = dzOptions.getItemAt(e.newIndex) as String;
+					switchPad();
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:SkinnableContainer
+		id="info"
+		backgroundColor="#dedede"
+		width="100%">
+		
+		<s:layout>
+			<s:HorizontalLayout
+				verticalAlign="middle"
+				paddingRight="10"
+				paddingLeft="10"/>
+		</s:layout>
+		
+		<s:Button
+			id="prevBtn"
+			label="Prev Pad"
+			height="{info.height - 20}"
+			click="prevPad(event)"
+			enabled="{numConnectedPads > 1}"/>
+		
+		<s:Spacer
+			width="100%"/>
+		
+		<s:Group>
+		
+			<s:layout>
+				<s:VerticalLayout
+					horizontalAlign="center"
+					paddingTop="10"
+					paddingBottom="10"/>
+			</s:layout>
+			
+			<s:Label
+				text="{padFriendlyName}"
+				fontSize="16"/>
+			
+			<s:Label
+				text="{padName}"/>
+			
+		</s:Group>
+		
+		<s:Spacer
+			width="100%"/>
+		
+		<s:Button
+			id="nextBtn"
+			label="Next Pad"
+			height="{info.height - 20}"
+			click="nextPad(event)"
+			enabled="{numConnectedPads > 1}"/>
+		
+	</s:SkinnableContainer>
+	
+	<s:SkinnableContainer
+		x="0"
+		y="{info.x + info.height}"
+		width="100%">
+		
+		<s:layout>
+			
+			<s:HorizontalLayout
+				horizontalAlign="center"
+				paddingTop="10"
+				paddingBottom="10"/>
+			
+		</s:layout>
+		
+		<s:ComboBox
+			id="mappingSelector"
+			width="300"
+			visible="false"
+			dataProvider="{controllerMappings}"
+			change="onMappingChange(event)"/>
+		
+	</s:SkinnableContainer>
+	
+	<s:Group
+		id="dzGroup"
+		width="100"
+		height="100"
+		x="{(800 - 100) / 2}"
+		y="{(800 / 2) + 50}">
+		
+		<s:layout>
+			<s:VerticalLayout
+				horizontalAlign="center"/>
+		</s:layout>
+		
+		<s:Label
+			text="Analog Dead Zone"/>
+		
+		<s:HSlider
+			id="dz"
+			width="100"
+			minimum="0.0"
+			maximum="1.0"
+			snapInterval="0.01"
+			change="onDeadZoneChange(event)"/>
+		
+		<s:Label
+			text="{dz.value}"/>
+		
+		<s:Label
+			text="Dead Zone Mode"/>
+		
+		<s:ComboBox
+			id="dzSelector"
+			width="100"
+			dataProvider="{dzOptions}"
+			change="onDeadZoneModeChange(event)"/>
+		
+	</s:Group>
+	
+</s:WindowedApplication>

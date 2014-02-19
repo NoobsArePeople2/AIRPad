@@ -1,0 +1,121 @@
+{
+    "_desc": "Dual Shock 3 on Mac",
+
+    "buttons": {
+
+        "faceOne": {
+            "_desc": "X",
+            "index": 14
+        },
+
+        "faceTwo": {
+            "_desc": "Circle",
+            "index": 13
+        },
+
+        "faceThree": {
+            "_desc": "Square",
+            "index": 15
+        },
+
+        "faceFour": {
+            "_desc": "Triangle",
+            "index": 12
+        },
+
+        "l1": {
+            "_desc": "L1",
+            "index": 10
+        },
+
+        "l3": {
+            "_desc": "Left stick press",
+            "index": 1
+        },
+
+        "r1": {
+            "_desc": "R1",
+            "index": 11
+        },
+
+        "r3": {
+            "_desc": "Right stick press",
+            "index": 2
+        },
+
+        "dpadUp": {
+            "_desc": "D-Pad up",
+            "index": 4
+        },
+
+        "dpadRight": {
+            "_desc": "D-Pad right",
+            "index": 5
+        },
+
+        "dpadDown": {
+            "_desc": "D-Pad down",
+            "index": 6
+        },
+
+        "dpadLeft": {
+            "_desc": "D-Pad left",
+            "index": 7
+        },
+
+        "start": {
+            "_desc": "Start",
+            "index": 3
+        },
+
+        "select": {
+            "_desc": "Select",
+            "index": 0
+        },
+
+        "system": {
+            "_desc": "PlayStation",
+            "index": 16
+        }
+
+    },
+
+    "axes": {
+
+        "leftStickX": {
+            "_desc": "Left stick, x-axis",
+            "index": 0
+        },
+
+        "leftStickY": {
+            "_desc": "Left stick, y-axis",
+            "index": 1
+        },
+
+        "rightStickX": {
+            "_desc": "Right stick, x-axis",
+            "index": 2
+        },
+
+        "rightStickY": {
+            "_desc": "Right stick, y-axis",
+            "index": 3
+        },
+
+        "l2": {
+            "_desc": "L2",
+            "index": 14
+        },
+
+        "r2": {
+            "_desc": "R2",
+            "index": 15
+        }
+
+    },
+
+    "deadZone": 0.05,
+    "triggerDefault": 0.0,
+    "triggerMin": -1.0,
+    "triggerMax": 1.0
+}

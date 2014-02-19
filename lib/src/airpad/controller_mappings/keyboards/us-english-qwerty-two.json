@@ -1,0 +1,144 @@
+{
+    "_desc": "US English QWERTY keyboard (two controllers).",
+
+    "numKeyboards": 2,
+
+    "controllers": [
+
+        {
+            "_desc": "Controller 1, left side of keyboard",
+
+            "buttons": {
+
+                "faceOne": {
+                    "key": "V"
+                },
+
+                "faceTwo": {
+                    "key": "G"
+                },
+
+                "faceThree": {
+                    "key": "C"
+                },
+
+                "faceFour": {
+                    "key": "F"
+                },
+
+                "l1": {
+                    "key": "B"
+                },
+
+                "r1": {
+                    "key": "T"
+                },
+
+                "l2": {
+                    "key": "SHIFT"
+                },
+
+                "r2": {
+                    "key": "CTRL"
+                },
+
+                "dpadUp": {
+                    "key": "W"
+                },
+
+                "dpadRight": {
+                    "key": "D"
+                },
+
+                "dpadDown": {
+                    "key": "S"
+                },
+
+                "dpadLeft": {
+                    "key": "A"
+                },
+
+                "start": {
+                    "key": "Q"
+                },
+
+                "select": {
+                    "key": "TAB"
+                },
+
+                "system": {
+                    "key": "F10"
+                }
+            }
+        },
+
+        {
+            "_desc": "Controller 2, right side of keyboard",
+
+            "buttons": {
+
+                "faceOne": {
+                    "key": "."
+                },
+
+                "faceTwo": {
+                    "key": ";"
+                },
+
+                "faceThree": {
+                    "key": "/"
+                },
+
+                "faceFour": {
+                    "key": "'"
+                },
+
+                "l1": {
+                    "key": "M"
+                },
+
+                "r1": {
+                    "key": "P"
+                },
+
+                "l2": {
+                    "key": "K"
+                },
+
+                "r2": {
+                    "key": "I"
+                },
+
+                "dpadUp": {
+                    "key": "UP"
+                },
+
+                "dpadRight": {
+                    "key": "RIGHT"
+                },
+
+                "dpadDown": {
+                    "key": "DOWN"
+                },
+
+                "dpadLeft": {
+                    "key": "LEFT"
+                },
+
+                "start": {
+                    "key": "ENTER"
+                },
+
+                "select": {
+                    "key": "]"
+                },
+
+                "system": {
+                    "key": "F10"
+                }
+            }
+        }
+
+    ]
+
+}
