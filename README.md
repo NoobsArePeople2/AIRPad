@@ -1,6 +1,8 @@
 # AIRPad
 
-Most libraries offer basic gamepad (and joystick, but we'll just say "gamepad" or "pad" or "controller" from here on) support &mdash; you can plug in a pad and start using it. The problem is that gamepad drivers often map buttons differently making it so you cannot treat different gamepads interchangebly. And that's on the same OS. If you set up a gamepad on Windows there is almost no chance that configuration will work on a Mac. AIRPad exists to alleviate this issue.
+Have you ever tried using a gamepad (sometimes called "joystick") with AIRControl? It works great until you plug in a different type of gamepad. Then you find out that different gamepads map their buttons differently -- and that's just on the same OS. If you set up a gamepad on Windows there is almost no chance that configuration will hold true on a Mac.
+
+AIRPad alleviates this issue.
 
 AIRPad is a wrapper for [AIRControl](https://github.com/AlexanderOMara/AIRControl) an AIR Native Extension that enables gamepad support in Adobe AIR. AIRPad provides a standard API for popular gamepads so you can configure your game to work with AIRPad and it will just work with any supported pad on Mac and Windows.
 
@@ -22,7 +24,7 @@ AIRPad is a wrapper for [AIRControl](https://github.com/AlexanderOMara/AIRContro
 
 #### Not Seeing Your Gamepad Here?
 
-The list of supported pads is limited to ones I have access to and any additional pads provided by others using AIRPad. If AIRPad doesn't support your gamepad check out the [AIRControl Show All Input](https://github.com/AlexanderOMara/AIRControl/tree/master/examples/AIRControl_Example_ShowAllInput) example app. This app will help you [create a controller mapping for AIRPad](#adding-mappings).
+The list of supported pads is limited to ones I have physical access to and any additional pads provided by others using AIRPad. If AIRPad doesn't support your gamepad check out the [AIRControl Show All Input](https://github.com/AlexanderOMara/AIRControl/tree/master/examples/AIRControl_Example_ShowAllInput) example app. This app will help you [create a controller mapping for AIRPad](#adding-mappings).
 
 ## Where To Find Things
 
@@ -32,71 +34,25 @@ The source code for the AIRPad library is in the `lib` folder. The testbed appli
 
 ### Cross Platform API
 
-AIRPad's API is standardized around the most popular PC ("PC" meaning "Mac and Windows") gamepads: the Xbox 360 and the Dual Shock 3. AIRPads feature four face buttons (corresponding with A, B, X, Y and Cross, Circle, Square, Triangle), two shoulder buttons (the 360's bumpers and DS3's L1 and R1), two triggers (360 triggers, DS3 L2 and R2), two analog sticks (and analog stick presses), a d-pad, start, select and system (guide, PS button).
+Standardized around on popular gamepads like the Xbox 360 pad and Dual Shock 3, AIRPad provides consistent button names across platforms and gamepads.
 
 ### Command Binding
 
-Having a standard API is nice as it allows us to write code like this and have it work consistently with all supported gamepads:
-
-    if (myPad.isButtonDown(AIRPadButton.FACE_ONE))
-    {
-        // Do something like "kick"
-    }
-
-Command binding allows us to take it a step farther and map game-specific names to button presses making our code much easier to grok:
-
-    // Bind a command to a button
-    myPad.bindCommand("kick", AIRPadButton.FACE_ONE);
-    // ...More bindings...
-
-    if (myPad.isButtonDown("kick"))
-    {
-        // Don't really need a comment here anymore
-    }
+Bind commands you define to specific AIRPad's predefined buttons enabling self-documenting code and player-configurable input settings.
 
 ### Analog Normalization and Dead Zones
 
-Analog gamepad sticks report two values, `x` and `y`, usually in the range of `-1` to `1` for each value. Some pads however will report in a `-100` to `100` range. Similarly analog triggers typically report values in a range of `0` to `100` but some will buck that trend and report in a range of `-100` to `100`. To make things even more fun analog inputs are of varying quality and they all wear out over time. What this means is that we'd expect a stick that isn't being touched to report `0,0` for it's x-y values but in reality we'll probably get something like `0.01253453,-0.123545`.
+AIRPad normalizes all analog values in a range of `-1` to `1` for analog sticks and `0` to `0` for analog triggers.
 
-AIRPad normalizes analog values.
-
-- All analog sticks are in a range of `-1` to `1`.
-- All triggers are normalized from `0` to `1`.
-
-To handle small values from analog sticks and triggers AIRPad uses a "dead zone" &mdash; a small threshold under which we ignore input from the stick. [This post](http://www.third-helix.com/2013/04/doing-thumbstick-dead-zones-right/) describes several ways of handling dead zones. AIRPad offers two dead zone modes: axial and radial. Axial dead zones treat each axis of the stick individually, essentially making the stick function like a d-pad. Radial dead zones consider the axes together providing a smoother experience.
+To handle the varying quality and wear put on analog inputs AIRPad uses dead zones -- small threshold under which values are ignored ([more here](http://www.third-helix.com/2013/04/doing-thumbstick-dead-zones-right/)).
 
 ### Analog "Buttons"
 
-Sometimes it's useful to treat an analog stick like a digital button. AIRPad provides standard "buttons" for this express purpose. Here, a code example should make this clearer:
-
-    // One way to do this
-    if (myPad.getStick(AIRPadButton.LEFT_STICK).x > myPad.deadZone)
-    {
-        // Left analog stick is being pressed to the right
-        // over the "dead zone" threshold
-    }
-
-    // A cleaner way
-    if (myPad.isButtonDown(AIRPadButton.LEFT_STICK_RIGHT))
-    {
-        // Left analog stick is being pressed right
-    }
-
-And of course we can use command binding to make things even nicer:
-
-    // Bind the same command to multiple buttons
-    myPad.bindCommand("moveRight", AIRPadButton.DPAD_RIGHT);
-    myPad.bindCommand("moveRight", AIDPadButton.LEFT_STICK_RIGHT);
-
-    if (myPad.isButtonDown("moveRight"))
-    {
-        // Either pressing the dpad right or
-        // the left analog stick right
-    }
+Treat analog sticks like digital buttons. AIRPad provides standard analog "buttons" that allow you to treat analog sticks like d-pads. You can even combine analog buttons with command binding.
 
 ### Connection/Disconnection Handling
 
-AIRPad dispatches events when a pad connects or disconnects from the PC allowing our games to handle situations like a wireless pad needing new batteries. AIRPads are identified by index (the first connected pad is 0, the next 1, and so on). When re-connecting a disconnected pad AIRPad will reconnect it at the same index so we keep track of pads by index without worry.
+Having your gamepad disconnect in the middle of a game sucks. It sucks even more to re-connect your gamepad only to have it not be recognized as the same gamepad. AIRPad works to ensure your reconnected pad works like nothing ever happened.
 
 ## Getting Started
 
@@ -174,7 +130,7 @@ It's important to note that the return value from `getPad()` may be `null` so yo
 1. __AIRPad__: A gamepad device.
 2. __AIRKeyboard__: A keyboard device.
 
-Obviously if we're using AIRPad we want to support gamepads, probably even prefer them, but we cannot be guaranteed our players will have a gamepad. If they do have a pad it may get unplugged or a wireless pad might lose charge. Having an `AIRKeyboard` allows us to seemlessly handle all of these situations without having to change our input API in our game &mdash; `AIRKeyboard` functions identically to `AIRPad` so far as the API is concerned.
+Obviously if we're using AIRPad we want to support gamepads, probably even prefer them, but we cannot be guaranteed our players will have a gamepad. If they do have a pad it may get unplugged or a wireless pad might lose charge. Having an `AIRKeyboard` allows us to seemlessly handle all of these situations without having to change our input API in our game -- `AIRKeyboard` functions identically to `AIRPad` so far as the API is concerned.
 
 ### Polling an IAIRPadDevice
 
@@ -232,7 +188,7 @@ Triggers may also be directly access via the `leftTrigger` and `rightTrigger` pr
 
 #### Missing Buttons
 
-The AIRPad API is standardized around the Xbox 360 and Dual Shock 3 as these are common, popular gamepads. However, not all pads fit this API perfectly. One notable example is the Wiimote without any attachments. A Wiimote has not analog sticks or triggers. In cases like this AIRPad will return the "up" value for any feature a controller lacks. This means that the analog stick x-y values for a Wiimote will always be 0. Likewise, trigger values will always be 0 as well.
+The AIRPad API is standardized around the Xbox 360 and Dual Shock 3 as these are common, popular gamepads. However, not all pads fit this API perfectly. One notable example is the Wiimote without any attachments. A Wiimote has no analog sticks nor triggers. In cases like this AIRPad will return the "up" value for any feature a controller lacks. This means that the analog stick x-y values for a Wiimote will always be 0. Likewise, trigger values will always be 0 as well.
 
 ### Dead Zone
 
@@ -268,7 +224,7 @@ We can also bind the same command to multiple buttons:
         // if (myPad.isButtonDown(AIRPadButton.FACE_ONE) || myPad.isButtonDown(AIRPadButton.FACE_TWO))
     }
 
-Another use for command binding is to support custom key bindings for players. By using command binding we can change which `AIRPadButton` is mapped to our game-specific `Commands` so `Commands.KICK` can be mapped to `AIRPadButton.L1` rather than `AIRPadButton.FACE_ONE`.
+Another use for command binding is to support custom key bindings for players. By using command binding we can change which `AIRPadButton` is mapped to our game-specific `Commands` so `Commands.KICK` can be mapped to `AIRPadButton.L1` rather than `AIRPadButton.FACE_ONE` without touching our input handling code.
 
 ### Analog "Buttons"
 
@@ -363,7 +319,7 @@ If you have a problem [open a ticket](https://github.com/NoobsArePeople2/AIRPad/
 
 ## Contact
 
-If you have a question or comment drop be a line at <a href="mailto:hello@seanmonahan.org?subject=AIRPad">hello@seanmonahan.org</a>.
+If you have a question or comment drop be a line at <a href="mailto:sean@seanmonahan.org?subject=AIRPad">sean@seanmonahan.org</a>.
 
 If you're using AIRPad in your game I'd love to hear about it!
 
