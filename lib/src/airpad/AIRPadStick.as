@@ -6,85 +6,85 @@
  */
 package airpad
 {
-    //==============================
-    // Imports
-    //==============================
-    
-    /**
-     * An analog stick for a gamepad.
-     */
-    public class AIRPadStick
-    {
-        //==============================
-        // Vars
-        //==============================
-        
+	//==============================
+	// Imports
+	//==============================
+
+	/**
+	 * An analog stick for a gamepad.
+	 */
+	public class AIRPadStick
+	{
+		//==============================
+		// Vars
+		//==============================
+
 		/**
 		 * Current value on the horizontal axis of the stick.
 		 * Negative is left along the axis, positive is right.
 		 */
-        private var _x:Number;
-		
+		private var _x:Number;
+
 		/**
 		 * Current value on the vertical axis of the stick.
 		 * Negative is up, positive is down.
 		 */
-        private var _y:Number;
-        
+		private var _y:Number;
+
 		/**
 		 * Dead zone for the stick.
 		 */
 		public var deadZone:Number;
-		
+
 		private var _dirty:Boolean;
-		
+
 		private var _magnitude:Number;
-		
+
 		//==============================
 		// Properties
 		//==============================
-		
+
 		public function get x():Number
 		{
 			return _x;
 		}
-		
+
 		public function set x(value:Number):void
 		{
 			_x = value;
 			_dirty = true;
 		}
-		
+
 		public function get y():Number
 		{
 			return _y;
 		}
-		
+
 		public function set y(value:Number):void
 		{
 			_y = value;
 			_dirty = true;
 		}
-		
-        //==============================
-        // Constructor
-        //==============================
-        
+
+		//==============================
+		// Constructor
+		//==============================
+
 		/**
 		 * Constructor.
 		 */
-        public function AIRPadStick()
-        {
+		public function AIRPadStick()
+		{
 			_dirty = true;
 			x = 0;
 			y = 0;
 			deadZone = 0.1;
-        }
-        
-        //==============================
-        // Public Methods
-        //==============================
-        
+		}
+
+		//==============================
+		// Public Methods
+		//==============================
+
 		public function magnitude():Number
 		{
 			if (_dirty || isNaN(_magnitude))
@@ -92,19 +92,19 @@ package airpad
 				_magnitude = Math.sqrt((_x * _x) + (_y * _y));
 				_dirty = false;
 			}
-			
+
 			return _magnitude;
 		}
-		
+
 		public function normalized():AIRPadStick
 		{
 			var copy:AIRPadStick = new AIRPadStick();
 			copy.x = x / magnitude();
 			copy.y = y / magnitude();
-			
+
 			return copy;
 		}
-		
+
 		/**
 		 * Calculate dead zone axially.
 		 */
@@ -113,11 +113,11 @@ package airpad
 			var val:Number;
 			val = (x < 0) ? -x : x;
 			if (val < deadZone) x = 0.0;
-			
+
 			val = (y < 0) ? -y : y;
 			if (val < deadZone) y = 0.0;
 		}
-		
+
 		/**
 		 * Calculate dead zone radially.
 		 */
@@ -130,7 +130,7 @@ package airpad
 				y = 0.0;
 			}
 		}
-		
+
 		/**
 		 * Calculate dead zone radially, then scale it.
 		 */
@@ -162,22 +162,22 @@ package airpad
 //				trace("x,y ", x, y);
 //			}
 //		}
-		
+
 		/**
 		 * Reset the stick to its default state.
 		 */
-        public function reset():void
-        {
-            x = 0.0;
-            y = 0.0;
-        }
-        
+		public function reset():void
+		{
+			x = 0.0;
+			y = 0.0;
+		}
+
 		/**
 		 * String representation of the stick.
 		 */
-        public function toString():String
-        {
-            return "x: " + x + ", y: " + y;
-        }
-    }
+		public function toString():String
+		{
+			return "x: " + x + ", y: " + y;
+		}
+	}
 }

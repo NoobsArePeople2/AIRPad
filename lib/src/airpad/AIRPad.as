@@ -7,23 +7,23 @@
  */
 package airpad
 {
-    //==============================
-    // Imports
-    //==============================
+	//==============================
+	// Imports
+	//==============================
 
-    import com.alexomara.ane.AIRControl.controllers.AIRControlController;
-    import com.alexomara.ane.AIRControl.controllers.elements.AIRControlControllerPOV;
-    
-    import flash.utils.Dictionary;
+	import com.alexomara.ane.AIRControl.controllers.AIRControlController;
+	import com.alexomara.ane.AIRControl.controllers.elements.AIRControlControllerPOV;
 
-    /**
-     * A gamepad.
-     */
-    public class AIRPad implements IAIRPadDevice
-    {
-        //==============================
-        // Constants
-        //==============================
+	import flash.utils.Dictionary;
+
+	/**
+	 * A gamepad.
+	 */
+	public class AIRPad implements IAIRPadDevice
+	{
+		//==============================
+		// Constants
+		//==============================
 
 		/**
 		 * Normalized minimum allowed value for an analog stick.
@@ -70,11 +70,11 @@ package airpad
 //		 */
 //		public static const DEAD_ZONE_RADIAL_SCALED:String = "deadZoneRadialScaled";
 
-        //==============================
-        // Vars
-        //==============================
+		//==============================
+		// Vars
+		//==============================
 
-        private var btns:Dictionary;
+		private var btns:Dictionary;
 
 		private var btnMappings:Dictionary;
 		private var axisMappings:Dictionary;
@@ -84,13 +84,13 @@ package airpad
 
 		private var bindings:Dictionary;
 
-        public var leftStick:AIRPadStick;
-        public var rightStick:AIRPadStick;
+		public var leftStick:AIRPadStick;
+		public var rightStick:AIRPadStick;
 
-        public var leftTrigger:Number;
-        public var rightTrigger:Number;
+		public var leftTrigger:Number;
+		public var rightTrigger:Number;
 
-        private var _deadZone:Number = 0.1;
+		private var _deadZone:Number = 0.1;
 
 		/**
 		 * When an analog value is greater than this
@@ -189,9 +189,9 @@ package airpad
 		private var _deadZoneMode:String;
 		private var calculateDeadZones:Function;
 
-        //==============================
-        // Properties
-        //==============================
+		//==============================
+		// Properties
+		//==============================
 
 		/**
 		 * Computer friendly name for the pad.
@@ -308,15 +308,15 @@ package airpad
 			return _notes;
 		}
 
-        //==============================
-        // Constructor
-        //==============================
+		//==============================
+		// Constructor
+		//==============================
 
 		/**
 		 * Constructor.
 		 */
-        public function AIRPad(controller:AIRControlController, index:uint, mapping:String = '', deadZoneMode:String = 'deadZoneRadial')
-        {
+		public function AIRPad(controller:AIRControlController, index:uint, mapping:String = '', deadZoneMode:String = 'deadZoneRadial')
+		{
 			_controller = controller;
 			_friendlyName = controller.name;
 			_name = controller.name.replace('(', '-').replace(')', '-').replace(/\s/g, '-');
@@ -339,9 +339,9 @@ package airpad
 
 			this.deadZoneMode = deadZoneMode;
 
-            btns = new Dictionary();
-            leftStick = new AIRPadStick();
-            rightStick = new AIRPadStick();
+			btns = new Dictionary();
+			leftStick = new AIRPadStick();
+			rightStick = new AIRPadStick();
 			leftTrigger = 0;
 			rightTrigger = 0;
 
@@ -354,11 +354,11 @@ package airpad
 			bindings = new Dictionary();
 
 			mapController(getFullMappingName(mapping));
-        }
+		}
 
-        //==============================
-        // Public Methods
-        //==============================
+		//==============================
+		// Public Methods
+		//==============================
 
 		/**
 		 * Update gamepad state.
@@ -371,15 +371,15 @@ package airpad
 
 			for (key in btns)
 			{
-                if (btns[key] < 0)
-                {
-                    btns[key] = AIRPadButton.BUTTON_UP;
-                }
-                else if (btns[key] > 1)
-                {
-                    btns[key] = AIRPadButton.BUTTON_HELD;
-                }
-            }
+				if (btns[key] < 0)
+				{
+					btns[key] = AIRPadButton.BUTTON_UP;
+				}
+				else if (btns[key] > 1)
+				{
+					btns[key] = AIRPadButton.BUTTON_HELD;
+				}
+			}
 
 			for (i = 0; i < _controller.buttonsTotal; ++i)
 			{
@@ -424,7 +424,7 @@ package airpad
 					{
 						clearButtonDown(AIRPadButton.DPAD_RIGHT);
 						cmd = bindings[AIRPadButton.DPAD_RIGHT]
-						if (cmd) clearButtonDown(cmd);	
+						if (cmd) clearButtonDown(cmd);
 					}
 				}
 
@@ -519,15 +519,15 @@ package airpad
 		 * @param string btn Button to test.
 		 * @return <code>true</code> is down, <code>false</code> is not.
 		 */
-        public function isButtonDown(btn:String):Boolean
-        {
-            if (!btns[btn])
-            {
-                return false;
-            }
+		public function isButtonDown(btn:String):Boolean
+		{
+			if (!btns[btn])
+			{
+				return false;
+			}
 
-            return btns[btn] > 0;
-        }
+			return btns[btn] > 0;
+		}
 
 		/**
 		 * Tests if the button was just pressed.
@@ -535,60 +535,60 @@ package airpad
 		 * @param string btn Button to test.
 		 * @return <code>true</code> if button was just pressed, <code>false</code> if not.
 		 */
-        public function wasButtonJustPressed(btn:String):Boolean
-        {
-            if (!btns[btn])
-            {
-                return false;
-            }
+		public function wasButtonJustPressed(btn:String):Boolean
+		{
+			if (!btns[btn])
+			{
+				return false;
+			}
 
-            return btns[btn] == AIRPadButton.BUTTON_JUST_PRESSED;
-        }
+			return btns[btn] == AIRPadButton.BUTTON_JUST_PRESSED;
+		}
 
-        /**
-         * Whether this key was just released.
-         * That is, was this key down on the last update tick
-         * but now up?
-         *
-         * @param key The key.
-         * @return True or false.
-         */
-        public function wasButtonJustReleased(btn:String):Boolean
-        {
-            if (!btns[btn])
-            {
-                return false;
-            }
+		/**
+		 * Whether this key was just released.
+		 * That is, was this key down on the last update tick
+		 * but now up?
+		 *
+		 * @param key The key.
+		 * @return True or false.
+		 */
+		public function wasButtonJustReleased(btn:String):Boolean
+		{
+			if (!btns[btn])
+			{
+				return false;
+			}
 
-            return btns[btn] == AIRPadButton.BUTTON_JUST_RELEASED;
-        }
+			return btns[btn] == AIRPadButton.BUTTON_JUST_RELEASED;
+		}
 
-        /**
-         * Sets the specified key as down.
-         *
-         * @param btn The button to set down.
-         */
-        public function setButtonDown(btn:String):void
-        {
-            if (btns[btn] && btns[btn] > 0)
-            {
-                btns[btn] = AIRPadButton.BUTTON_HELD;
-            }
-            else
-            {
-                btns[btn] = AIRPadButton.BUTTON_JUST_PRESSED;
-            }
-        }
+		/**
+		 * Sets the specified key as down.
+		 *
+		 * @param btn The button to set down.
+		 */
+		public function setButtonDown(btn:String):void
+		{
+			if (btns[btn] && btns[btn] > 0)
+			{
+				btns[btn] = AIRPadButton.BUTTON_HELD;
+			}
+			else
+			{
+				btns[btn] = AIRPadButton.BUTTON_JUST_PRESSED;
+			}
+		}
 
-        /**
-         * Sets the specified key as "just released".
-         *
-         * @param btn The button to clear.
-         */
-        public function clearButtonDown(btn:String):void
-        {
-            btns[btn] = AIRPadButton.BUTTON_JUST_RELEASED;
-        }
+		/**
+		 * Sets the specified key as "just released".
+		 *
+		 * @param btn The button to clear.
+		 */
+		public function clearButtonDown(btn:String):void
+		{
+			btns[btn] = AIRPadButton.BUTTON_JUST_RELEASED;
+		}
 
 		/**
 		 * Gets an analog stick by name.
@@ -630,16 +630,16 @@ package airpad
 			return 0;
 		}
 
-        /**
-         * Clears the entire state for all buttons.
-         */
-        public function clearState():void
-        {
-            for (var btn:String in btns)
-            {
-                btns[btn] = AIRPadButton.BUTTON_UP;
-            }
-        }
+		/**
+		 * Clears the entire state for all buttons.
+		 */
+		public function clearState():void
+		{
+			for (var btn:String in btns)
+			{
+				btns[btn] = AIRPadButton.BUTTON_UP;
+			}
+		}
 
 		/**
 		 * Binds a command to a button.
@@ -698,9 +698,9 @@ package airpad
 			mapController(getFullMappingName(mapping));
 		}
 
-        //==============================
-        // Private, Protected Methods
-        //==============================
+		//==============================
+		// Private, Protected Methods
+		//==============================
 
 		/**
 		 * Calculate axial dead zones for left and right sticks.
@@ -771,9 +771,9 @@ package airpad
 				{
 					clearButtonDown(AIRPadButton.LEFT_STICK_RIGHT);
 					cmd = bindings[AIRPadButton.LEFT_STICK_RIGHT];
-					if (cmd) clearButtonDown(cmd);	
+					if (cmd) clearButtonDown(cmd);
 				}
-				
+
 				if (isButtonDown(AIRPadButton.LEFT_STICK_LEFT))
 				{
 					clearButtonDown(AIRPadButton.LEFT_STICK_LEFT);
@@ -817,7 +817,7 @@ package airpad
 					cmd = bindings[AIRPadButton.LEFT_STICK_UP];
 					if (cmd) clearButtonDown(cmd);
 				}
-				
+
 				if (isButtonDown(AIRPadButton.LEFT_STICK_DOWN))
 				{
 					clearButtonDown(AIRPadButton.LEFT_STICK_DOWN);
@@ -861,7 +861,7 @@ package airpad
 					cmd = bindings[AIRPadButton.RIGHT_STICK_RIGHT];
 					if (cmd) clearButtonDown(cmd);
 				}
-				
+
 				if (isButtonDown(AIRPadButton.RIGHT_STICK_LEFT))
 				{
 					clearButtonDown(AIRPadButton.RIGHT_STICK_LEFT);
@@ -905,7 +905,7 @@ package airpad
 					cmd = bindings[AIRPadButton.RIGHT_STICK_UP];
 					if (cmd) clearButtonDown(cmd);
 				}
-				
+
 				if (isButtonDown(AIRPadButton.RIGHT_STICK_DOWN))
 				{
 					clearButtonDown(AIRPadButton.RIGHT_STICK_DOWN);
@@ -1083,5 +1083,5 @@ package airpad
 			triggerNormalizer = defaultTriggerNormalizer;
 
 		}
-    }
+	}
 }
